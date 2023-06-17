@@ -76,4 +76,42 @@
                     x: rumskib_x,
                     y: rumskib_y,
                     bredde: RUMSKIB_BREDDE,
-                    højde: RUMSK
+                    højde: RUMSKIB_HØJDE
+                };
+                if (kollidér(asteroid_rekt, rumskib_rekt)) {
+                    console.log("Spillet er slut!");
+                    clearInterval(spilOpdatering);
+                }
+            }
+
+            // Fjern asteroider, der er uden for skærmen
+            asteroider = asteroider.filter(function(asteroid) {
+                return asteroid.y > -ASTEROIDE_RADIUS * 2;
+            });
+
+            // Tegn rumskibet
+            context.drawImage(rumskib_billede, rumskib_x, rumskib_y, RUMSKIB_BREDDE, RUMSKIB_HØJDE);
+
+            // Tegn asteroider
+            for (var i = 0; i < asteroider.length; i++) {
+                var asteroid = asteroider[i];
+                context.drawImage(asteroide_billede, asteroid.x, asteroid.y, ASTEROIDE_RADIUS * 2, ASTEROIDE_RADIUS * 2);
+            }
+        }
+
+        // Kollisionsdetektion
+        function kollidér(rekt1, rekt2) {
+            return rekt1.x < rekt2.x + rekt2.bredde &&
+                rekt1.x + rekt1.bredde > rekt2.x &&
+                rekt1.y < rekt2.y + rekt2.højde &&
+                rekt1.y + rekt1.højde > rekt2.y;
+        }
+
+        // Start spillet
+        var spilOpdatering = setInterval(function() {
+            context.clearRect(0, 0, SKÆRM_BREDDE, SKÆRM_HØJDE);
+            opdaterSpil();
+        }, 16);  // Opdatering hver 16 ms (ca. 60 FPS)
+    </script>
+</body>
+</html>

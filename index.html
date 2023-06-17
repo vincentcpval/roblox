@@ -1,81 +1,112 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rumskudsspil</title>
+    <title>Skydespil</title>
     <style>
-        canvas {
+        #skydespil {
             border: 1px solid black;
         }
     </style>
 </head>
 <body>
-    <canvas id="rumskudsspil" width="800" height="600"></canvas>
+    <canvas id="skydespil" width="800" height="600"></canvas>
     <script>
-        // Hent HTML-elementet canvas
-        var canvas = document.getElementById("rumskudsspil");
+        var canvas = document.getElementById("skydespil");
         var context = canvas.getContext("2d");
 
-        // Definér konstante værdier
-        var SKÆRM_BREDDE = canvas.width;
-        var SKÆRM_HØJDE = canvas.height;
-        var RUMSKIB_BREDDE = 80;
-        var RUMSKIB_HØJDE = 60;
-        var ASTEROIDE_RADIUS = 30;
-        var SKYDE_HASTIGHED = 10;
-        var ASTEROIDE_HASTIGHED = 5;
+        var skærmBredde = canvas.width;
+        var skærmHøjde = canvas.height;
+        var skudHastighed = 5;
+        var asteroidHastighed = 2;
+        var score = 0;
 
-        // Indlæs billeder
-        var rumskib_billede = new Image();
-        rumskib_billede.src = "rumskib.png";
-        var asteroide_billede = new Image();
-        asteroide_billede.src = "asteroide.png";
+        var rumskib = {
+            x: skærmBredde / 2,
+            y: skærmHøjde - 50,
+            bredde: 50,
+            højde: 50
+        };
 
-        // Positioner
-        var rumskib_x = SKÆRM_BREDDE / 2 - RUMSKIB_BREDDE / 2;
-        var rumskib_y = SKÆRM_HØJDE - RUMSKIB_HØJDE - 20;
+        var skud = [];
 
-        // Liste over asteroider
         var asteroider = [];
 
-        // Lyt efter tastetryk
-        document.addEventListener("keydown", function(event) {
-            if (event.key === " ") {
-                var x = rumskib_x + RUMSKIB_BREDDE / 2 - ASTEROIDE_RADIUS;
-                var y = rumskib_y;
-                asteroider.push({ x: x, y: y });
-            }
+        canvas.addEventListener("mousemove", function(event) {
+            rumskib.x = event.clientX - canvas.offsetLeft;
         });
 
-        // Opdater spillet
-        function opdaterSpil() {
-            // Bevægelse af rumskibet
-            document.addEventListener("keydown", function(event) {
-                if (event.key === "ArrowLeft" && rumskib_x > 0) {
-                    rumskib_x -= 5;
-                }
-                if (event.key === "ArrowRight" && rumskib_x < SKÆRM_BREDDE - RUMSKIB_BREDDE) {
-                    rumskib_x += 5;
-                }
-            });
+        canvas.addEventListener("click", function(event) {
+            var x = rumskib.x + rumskib.bredde / 2;
+            var y = rumskib.y;
+            skud.push({ x: x, y: y });
+        });
 
-            // Bevægelse af asteroider
-            for (var i = 0; i < asteroider.length; i++) {
-                asteroider[i].y -= ASTEROIDE_HASTIGHED;
+        function opdaterSpil() {
+            context.clearRect(0, 0, skærmBredde, skærmHøjde);
+
+            // Opdater skud
+            for (var i = 0; i < skud.length; i++) {
+                var s = skud[i];
+                s.y -= skudHastighed;
+                context.fillStyle = "white";
+                context.fillRect(s.x, s.y, 2, 10);
+
+                // Tjek kollision mellem skud og asteroider
+                for (var j = 0; j < asteroider.length; j++) {
+                    var a = asteroider[j];
+                    if (s.x >= a.x && s.x <= a.x + a.bredde && s.y >= a.y && s.y <= a.y + a.højde) {
+                        asteroider.splice(j, 1);
+                        skud.splice(i, 1);
+                        score += 1;
+                        break;
+                    }
+                }
+
+                if (s.y < 0) {
+                    skud.splice(i, 1);
+                }
             }
 
-            // Tjek kollision mellem asteroider og rumskib
+            // Opdater asteroider
             for (var i = 0; i < asteroider.length; i++) {
-                var asteroid = asteroider[i];
-                var asteroid_rekt = {
-                    x: asteroid.x,
-                    y: asteroid.y,
-                    bredde: ASTEROIDE_RADIUS * 2,
-                    højde: ASTEROIDE_RADIUS * 2
-                };
-                var rumskib_rekt = {
-                    x: rumskib_x,
-                    y: rumskib_y,
-                    bredde: RUMSKIB_BREDDE,
-                    højde: RUMSKIB_HØJDE
-                };
-                if (k
+                var a = asteroider[i];
+                a.y += asteroidHastighed;
+                context.fillStyle = "red";
+                context.fillRect(a.x, a.y, a.bredde, a.højde);
+
+                // Tjek kollision mellem rumskib og asteroider
+                if (a.y + a.højde >= rumskib.y && a.y <= rumskib.y + rumskib.højde &&
+                    a.x + a.bredde >= rumskib.x && a.x <= rumskib.x + rumskib.bredde) {
+                    alert("Spillet er slut! Din score: " + score);
+                    location.reload();
+                }
+
+                if (a.y > skærmHøjde) {
+                    asteroider.splice(i, 1);
+                }
+            }
+
+            // Opdater rumskib
+            context.fillStyle = "blue";
+            context.fillRect(rumskib.x, rumskib.y, rumskib.bredde, rumskib.højde);
+
+            // Tegn score
+            context.fillStyle = "black";
+            context.font = "16px Arial";
+            context.fillText("Score: " + score, 10, 20);
+
+            requestAnimationFrame(opdaterSpil);
+        }
+
+        function genererAsteroid() {
+            var bredde = Math.random() * 50 + 20;
+            var x = Math.random() * (skærmBredde - bredde);
+            asteroider.push({ x: x, y: -bredde, bredde: bredde, højde: bredde });
+            setTimeout(genererAsteroid, Math.random() * 2000 + 1000);
+        }
+
+        genererAsteroid();
+        opdaterSpil();
+    </script>
+</body>
+</html>

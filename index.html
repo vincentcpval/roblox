@@ -44,6 +44,15 @@
             skud.push({ x: x, y: y });
         });
 
+        // Hent fisken
+        var fiskBillede = new Image();
+        fiskBillede.src = "fish-vektor-ikon-eps-vectorer_csp57805632.jpg";
+
+        fiskBillede.onload = function() {
+            genererFisk();
+            opdaterSpil();
+        };
+
         function opdaterSpil() {
             context.clearRect(0, 0, skærmBredde, skærmHøjde);
 
@@ -74,14 +83,8 @@
             for (var i = 0; i < fisk.length; i++) {
                 var f = fisk[i];
                 f.y += fiskHastighed;
-                // Tegn en fisk
-                context.fillStyle = "orange";
-                context.beginPath();
-                context.moveTo(f.x + f.bredde / 2, f.y);
-                context.lineTo(f.x, f.y + f.højde);
-                context.lineTo(f.x + f.bredde, f.y + f.højde);
-                context.closePath();
-                context.fill();
+                // Tegn fisk
+                context.drawImage(fiskBillede, f.x, f.y, f.bredde, f.højde);
 
                 // Tjek kollision mellem rumskib og fisk
                 if (f.y + f.højde >= rumskib.y && f.y <= rumskib.y + rumskib.højde &&
@@ -119,9 +122,6 @@
             fisk.push({ x: x, y: -bredde, bredde: bredde, højde: bredde });
             setTimeout(genererFisk, Math.random() * 2000 + 1000);
         }
-
-        genererFisk();
-        opdaterSpil();
     </script>
 </body>
 </html>

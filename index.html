@@ -19,6 +19,9 @@
         var skudHastighed = 5;
         var asteroidHastighed = 2;
         var score = 0;
+        var hastighedsForøgelse = 0.2;
+        var hastighedsInterval = 10;
+        var hastighedsTæller = 0;
 
         var rumskib = {
             x: skærmBredde / 2,
@@ -94,6 +97,12 @@
             context.fillStyle = "black";
             context.font = "16px Arial";
             context.fillText("Score: " + score, 10, 20);
+
+            hastighedsTæller++;
+            if (hastighedsTæller % hastighedsInterval === 0) {
+                asteroidHastighed += hastighedsForøgelse;
+                hastighedsTæller = 0;
+            }
 
             requestAnimationFrame(opdaterSpil);
         }

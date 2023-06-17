@@ -32,10 +32,10 @@
         var asteroider = [];
 
         canvas.addEventListener("mousemove", function(event) {
-            rumskib.x = event.clientX - canvas.offsetLeft;
+            rumskib.x = event.clientX - canvas.offsetLeft - rumskib.bredde / 2;
         });
 
-        canvas.addEventListener("click", function(event) {
+        canvas.addEventListener("mousedown", function(event) {
             var x = rumskib.x + rumskib.bredde / 2;
             var y = rumskib.y;
             skud.push({ x: x, y: y });

@@ -1,1 +1,67 @@
-hallo
+import pygame
+import random
+
+# Konstante værdier
+SKÆRM_BREDDE = 800
+SKÆRM_HØJDE = 600
+RUMSKIB_BREDDE = 80
+RUMSKIB_HØJDE = 60
+ASTEROIDE_RADIUS = 30
+SKYDE_HASTIGHED = 10
+ASTEROIDE_HASTIGHED = 5
+
+# Initialiserer pygame
+pygame.init()
+skærm = pygame.display.set_mode((SKÆRM_BREDDE, SKÆRM_HØJDE))
+clock = pygame.time.Clock()
+
+# Indlæser billeder
+rumskib_billede = pygame.image.load("rumskib.png")
+rumskib_billede = pygame.transform.scale(rumskib_billede, (RUMSKIB_BREDDE, RUMSKIB_HØJDE))
+asteroide_billede = pygame.image.load("asteroide.png")
+asteroide_billede = pygame.transform.scale(asteroide_billede, (ASTEROIDE_RADIUS * 2, ASTEROIDE_RADIUS * 2))
+
+# Positioner
+rumskib_x = SKÆRM_BREDDE // 2 - RUMSKIB_BREDDE // 2
+rumskib_y = SKÆRM_HØJDE - RUMSKIB_HØJDE - 20
+
+# Liste over asteroider
+asteroider = []
+
+# Spilløkke
+kør_spil = True
+while kør_spil:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            kør_spil = False
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                x = rumskib_x + RUMSKIB_BREDDE // 2 - ASTEROIDE_RADIUS
+                y = rumskib_y
+                asteroider.append([x, y])
+    
+    # Bevægelse af rumskibet
+    tast = pygame.key.get_pressed()
+    if tast[pygame.K_LEFT] and rumskib_x > 0:
+        rumskib_x -= 5
+    if tast[pygame.K_RIGHT] and rumskib_x < SKÆRM_BREDDE - RUMSKIB_BREDDE:
+        rumskib_x += 5
+    
+    # Bevægelse af asteroider
+    for asteroid in asteroider:
+        asteroid[1] -= ASTEROIDE_HASTIGHED
+    
+    # Tjek kollision mellem asteroider og rumskib
+    for asteroid in asteroider:
+        asteroid_rekt = pygame.Rect(asteroid[0], asteroid[1], ASTEROIDE_RADIUS * 2, ASTEROIDE_RADIUS * 2)
+        rumskib_rekt = pygame.Rect(rumskib_x, rumskib_y, RUMSKIB_BREDDE, RUMSKIB_HØJDE)
+        if asteroid_rekt.colliderect(rumskib_rekt):
+            print("Spillet er slut!")
+            kør_spil = False
+    
+    # Fjern asteroider, der er uden for skærmen
+    asteroider = [asteroid for asteroid in asteroider if asteroid[1] > -ASTEROIDE_RADIUS * 2]
+    
+    # Opdater skærmen
+    skærm.fill((0, 0, 0

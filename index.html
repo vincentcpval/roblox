@@ -1,67 +1,79 @@
-import pygame
-import random
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rumskudsspil</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="rumskudsspil" width="800" height="600"></canvas>
+    <script>
+        // Hent HTML-elementet canvas
+        var canvas = document.getElementById("rumskudsspil");
+        var context = canvas.getContext("2d");
 
-# Konstante værdier
-SKÆRM_BREDDE = 800
-SKÆRM_HØJDE = 600
-RUMSKIB_BREDDE = 80
-RUMSKIB_HØJDE = 60
-ASTEROIDE_RADIUS = 30
-SKYDE_HASTIGHED = 10
-ASTEROIDE_HASTIGHED = 5
+        // Definér konstante værdier
+        var SKÆRM_BREDDE = canvas.width;
+        var SKÆRM_HØJDE = canvas.height;
+        var RUMSKIB_BREDDE = 80;
+        var RUMSKIB_HØJDE = 60;
+        var ASTEROIDE_RADIUS = 30;
+        var SKYDE_HASTIGHED = 10;
+        var ASTEROIDE_HASTIGHED = 5;
 
-# Initialiserer pygame
-pygame.init()
-skærm = pygame.display.set_mode((SKÆRM_BREDDE, SKÆRM_HØJDE))
-clock = pygame.time.Clock()
+        // Indlæs billeder
+        var rumskib_billede = new Image();
+        rumskib_billede.src = "rumskib.png";
+        var asteroide_billede = new Image();
+        asteroide_billede.src = "asteroide.png";
 
-# Indlæser billeder
-rumskib_billede = pygame.image.load("rumskib.png")
-rumskib_billede = pygame.transform.scale(rumskib_billede, (RUMSKIB_BREDDE, RUMSKIB_HØJDE))
-asteroide_billede = pygame.image.load("asteroide.png")
-asteroide_billede = pygame.transform.scale(asteroide_billede, (ASTEROIDE_RADIUS * 2, ASTEROIDE_RADIUS * 2))
+        // Positioner
+        var rumskib_x = SKÆRM_BREDDE / 2 - RUMSKIB_BREDDE / 2;
+        var rumskib_y = SKÆRM_HØJDE - RUMSKIB_HØJDE - 20;
 
-# Positioner
-rumskib_x = SKÆRM_BREDDE // 2 - RUMSKIB_BREDDE // 2
-rumskib_y = SKÆRM_HØJDE - RUMSKIB_HØJDE - 20
+        // Liste over asteroider
+        var asteroider = [];
 
-# Liste over asteroider
-asteroider = []
+        // Lyt efter tastetryk
+        document.addEventListener("keydown", function(event) {
+            if (event.key === " ") {
+                var x = rumskib_x + RUMSKIB_BREDDE / 2 - ASTEROIDE_RADIUS;
+                var y = rumskib_y;
+                asteroider.push({ x: x, y: y });
+            }
+        });
 
-# Spilløkke
-kør_spil = True
-while kør_spil:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            kør_spil = False
-        
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                x = rumskib_x + RUMSKIB_BREDDE // 2 - ASTEROIDE_RADIUS
-                y = rumskib_y
-                asteroider.append([x, y])
-    
-    # Bevægelse af rumskibet
-    tast = pygame.key.get_pressed()
-    if tast[pygame.K_LEFT] and rumskib_x > 0:
-        rumskib_x -= 5
-    if tast[pygame.K_RIGHT] and rumskib_x < SKÆRM_BREDDE - RUMSKIB_BREDDE:
-        rumskib_x += 5
-    
-    # Bevægelse af asteroider
-    for asteroid in asteroider:
-        asteroid[1] -= ASTEROIDE_HASTIGHED
-    
-    # Tjek kollision mellem asteroider og rumskib
-    for asteroid in asteroider:
-        asteroid_rekt = pygame.Rect(asteroid[0], asteroid[1], ASTEROIDE_RADIUS * 2, ASTEROIDE_RADIUS * 2)
-        rumskib_rekt = pygame.Rect(rumskib_x, rumskib_y, RUMSKIB_BREDDE, RUMSKIB_HØJDE)
-        if asteroid_rekt.colliderect(rumskib_rekt):
-            print("Spillet er slut!")
-            kør_spil = False
-    
-    # Fjern asteroider, der er uden for skærmen
-    asteroider = [asteroid for asteroid in asteroider if asteroid[1] > -ASTEROIDE_RADIUS * 2]
-    
-    # Opdater skærmen
-    skærm.fill((0, 0, 0
+        // Opdater spillet
+        function opdaterSpil() {
+            // Bevægelse af rumskibet
+            document.addEventListener("keydown", function(event) {
+                if (event.key === "ArrowLeft" && rumskib_x > 0) {
+                    rumskib_x -= 5;
+                }
+                if (event.key === "ArrowRight" && rumskib_x < SKÆRM_BREDDE - RUMSKIB_BREDDE) {
+                    rumskib_x += 5;
+                }
+            });
+
+            // Bevægelse af asteroider
+            for (var i = 0; i < asteroider.length; i++) {
+                asteroider[i].y -= ASTEROIDE_HASTIGHED;
+            }
+
+            // Tjek kollision mellem asteroider og rumskib
+            for (var i = 0; i < asteroider.length; i++) {
+                var asteroid = asteroider[i];
+                var asteroid_rekt = {
+                    x: asteroid.x,
+                    y: asteroid.y,
+                    bredde: ASTEROIDE_RADIUS * 2,
+                    højde: ASTEROIDE_RADIUS * 2
+                };
+                var rumskib_rekt = {
+                    x: rumskib_x,
+                    y: rumskib_y,
+                    bredde: RUMSKIB_BREDDE,
+                    højde: RUMSK

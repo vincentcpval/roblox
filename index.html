@@ -17,7 +17,7 @@
         var skærmBredde = canvas.width;
         var skærmHøjde = canvas.height;
         var skudHastighed = 5;
-        var asteroidHastighed = 2;
+        var fiskHastighed = 2;
         var score = 0;
         var hastighedsForøgelse = 0.2;
         var hastighedsInterval = 10;
@@ -32,7 +32,7 @@
 
         var skud = [];
 
-        var asteroider = [];
+        var fisk = [];
 
         canvas.addEventListener("mousemove", function(event) {
             rumskib.x = event.clientX - canvas.offsetLeft - rumskib.bredde / 2;
@@ -54,11 +54,11 @@
                 context.fillStyle = "white";
                 context.fillRect(s.x, s.y, 2, 10);
 
-                // Tjek kollision mellem skud og asteroider
-                for (var j = 0; j < asteroider.length; j++) {
-                    var a = asteroider[j];
-                    if (s.x >= a.x && s.x <= a.x + a.bredde && s.y >= a.y && s.y <= a.y + a.højde) {
-                        asteroider.splice(j, 1);
+                // Tjek kollision mellem skud og fisk
+                for (var j = 0; j < fisk.length; j++) {
+                    var f = fisk[j];
+                    if (s.x >= f.x && s.x <= f.x + f.bredde && s.y >= f.y && s.y <= f.y + f.højde) {
+                        fisk.splice(j, 1);
                         skud.splice(i, 1);
                         score += 1;
                         break;
@@ -70,22 +70,28 @@
                 }
             }
 
-            // Opdater asteroider
-            for (var i = 0; i < asteroider.length; i++) {
-                var a = asteroider[i];
-                a.y += asteroidHastighed;
-                context.fillStyle = "red";
-                context.fillRect(a.x, a.y, a.bredde, a.højde);
+            // Opdater fisk
+            for (var i = 0; i < fisk.length; i++) {
+                var f = fisk[i];
+                f.y += fiskHastighed;
+                // Tegn en fisk
+                context.fillStyle = "orange";
+                context.beginPath();
+                context.moveTo(f.x + f.bredde / 2, f.y);
+                context.lineTo(f.x, f.y + f.højde);
+                context.lineTo(f.x + f.bredde, f.y + f.højde);
+                context.closePath();
+                context.fill();
 
-                // Tjek kollision mellem rumskib og asteroider
-                if (a.y + a.højde >= rumskib.y && a.y <= rumskib.y + rumskib.højde &&
-                    a.x + a.bredde >= rumskib.x && a.x <= rumskib.x + rumskib.bredde) {
+                // Tjek kollision mellem rumskib og fisk
+                if (f.y + f.højde >= rumskib.y && f.y <= rumskib.y + rumskib.højde &&
+                    f.x + f.bredde >= rumskib.x && f.x <= rumskib.x + rumskib.bredde) {
                     alert("Spillet er slut! Din score: " + score);
                     location.reload();
                 }
 
-                if (a.y > skærmHøjde) {
-                    asteroider.splice(i, 1);
+                if (f.y > skærmHøjde) {
+                    fisk.splice(i, 1);
                 }
             }
 
@@ -100,21 +106,21 @@
 
             hastighedsTæller++;
             if (hastighedsTæller % hastighedsInterval === 0) {
-                asteroidHastighed += hastighedsForøgelse;
+                fiskHastighed += hastighedsForøgelse;
                 hastighedsTæller = 0;
             }
 
             requestAnimationFrame(opdaterSpil);
         }
 
-        function genererAsteroid() {
+        function genererFisk() {
             var bredde = Math.random() * 50 + 20;
             var x = Math.random() * (skærmBredde - bredde);
-            asteroider.push({ x: x, y: -bredde, bredde: bredde, højde: bredde });
-            setTimeout(genererAsteroid, Math.random() * 2000 + 1000);
+            fisk.push({ x: x, y: -bredde, bredde: bredde, højde: bredde });
+            setTimeout(genererFisk, Math.random() * 2000 + 1000);
         }
 
-        genererAsteroid();
+        genererFisk();
         opdaterSpil();
     </script>
 </body>
